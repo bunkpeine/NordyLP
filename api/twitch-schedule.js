@@ -1,4 +1,13 @@
 export default async function handler(req, res) {
+  res.json({
+    clientId: process.env.TWITCH_CLIENT_ID ? "✅ gesetzt" : "❌ fehlt",
+    clientSecret: process.env.TWITCH_CLIENT_SECRET ? "✅ gesetzt" : "❌ fehlt",
+    userId: process.env.TWITCH_USER_ID || "❌ fehlt"
+  });
+}
+
+
+export default async function handler(req, res) {
   try {
     // 1. Frisches Access Token holen (immer neu)
     const tokenResponse = await fetch("https://id.twitch.tv/oauth2/token", {
