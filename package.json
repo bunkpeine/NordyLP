@@ -2,10 +2,11 @@
   "name": "nordylp-app",
   "version": "1.0.0",
   "private": true,
-  "type": "module",
   "scripts": {
     "dev": "vercel dev",
-    "start": "vercel dev"
+    "build": "vercel build"
   },
-  "dependencies": {}
+  "dependencies": {
+    "node-fetch": "^3.3.2"
+  }
 }
