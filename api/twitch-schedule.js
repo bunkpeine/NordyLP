@@ -1,21 +1,20 @@
 export default async function handler(req, res) {
-  res.json({
-    clientId: process.env.TWITCH_CLIENT_ID || "missing",
-    secret: process.env.TWITCH_CLIENT_SECRET ? "set" : "missing",
-    userId: process.env.TWITCH_USER_ID || "missing",
-    token: process.env.TWITCH_OAUTH_TOKEN ? "set" : "missing"
-  });
-}
-
-
-export default async function handler(req, res) {
   try {
     // 1. Hole Access Token
     const tokenResponse = await fetch(
       `https://id.twitch.tv/oauth2/token?client_id=${process.env.TWITCH_CLIENT_ID}&client_secret=${process.env.TWITCH_CLIENT_SECRET}&grant_type=client_credentials`,
       { method: "POST" }
     );
+
     const tokenData = await tokenResponse.json();
+
+    if (!tokenResponse.ok) {
+      return res.status(tokenResponse.status).json({
+        error: tokenData.error || "Auth error",
+        message: tokenData.message || "Failed to fetch access token",
+      });
+    }
+
     const accessToken = tokenData.access_token;
 
     // 2. Anfrage an Twitch Schedule API
@@ -39,16 +38,10 @@ export default async function handler(req, res) {
         message: data.message || "Unknown error",
       });
     }
-    } catch (err) {
+  } catch (err) {
     res.status(500).json({
       error: "Request to Twitch failed",
       details: err.message,
-      env: {
-        clientId: process.env.TWITCH_CLIENT_ID ? "ok" : "missing",
-        clientSecret: process.env.TWITCH_CLIENT_SECRET ? "ok" : "missing",
-        userId: process.env.TWITCH_USER_ID || "missing",
-      }
     });
   }
-
 }
