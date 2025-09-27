@@ -6,7 +6,7 @@ export default async function handler(req, res) {
       headers: {
         "Content-Type": "application/x-www-form-urlencoded"
       },
-      body: `client_id=${process.env.TWITCH_CLIENT_ID}&client_secret=${process.env.TWITCH_CLIENT_SECRET}&grant_type=client_credentials`
+      body: `client_id=${process.env.gpqiwy5bgyaniw4avqmsl0zo2re1p8}&client_secret=${process.env.6z44fcq92brjmyls36gudfag0oe0fm}&grant_type=client_credentials`
     });
 
     const tokenData = await tokenResponse.json();
