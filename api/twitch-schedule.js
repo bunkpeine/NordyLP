@@ -1,7 +1,7 @@
 // api/twitch-schedule.js
-const fetch = require("node-fetch");
+import fetch from "node-fetch";
 
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
   try {
     // 1. Access Token holen
     const tokenResponse = await fetch(
@@ -9,12 +9,15 @@ module.exports = async (req, res) => {
       { method: "POST" }
     );
 
+    const tokenData = await tokenResponse.json();
+
     if (!tokenResponse.ok) {
-      const errText = await tokenResponse.text();
-      return res.status(500).json({ error: "Auth error", details: errText });
+      return res.status(500).json({
+        error: "Auth error",
+        details: tokenData,
+      });
     }
 
-    const tokenData = await tokenResponse.json();
     const accessToken = tokenData.access_token;
 
     // 2. Twitch Schedule API aufrufen
@@ -23,28 +26,25 @@ module.exports = async (req, res) => {
       {
         headers: {
           "Client-ID": process.env.TWITCH_CLIENT_ID,
-          "Authorization": `Bearer ${accessToken}`,
+          Authorization: `Bearer ${accessToken}`,
         },
       }
     );
 
+    const data = await response.json();
+
     if (!response.ok) {
-      const errText = await response.text();
       return res.status(response.status).json({
         error: "Twitch API error",
-        details: errText,
+        details: data,
       });
     }
 
-    const data = await response.json();
-
-    // 3. Ergebnis zurückgeben
     res.status(200).json(data);
-
   } catch (err) {
     res.status(500).json({
-      error: "Request to Twitch failed",
+      error: "Server error",
       details: err.message,
     });
   }
-};
+}
