@@ -1,12 +1,13 @@
+// api/get-userid.js
 export default async function handler(req, res) {
   try {
-    // Schritt 1: Access-Token holen
+    // 1. Access Token holen
     const tokenResponse = await fetch("https://id.twitch.tv/oauth2/token", {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded"
       },
-      body: `client_id=${process.env.gpqiwy5bgyaniw4avqmsl0zo2re1p8}&client_secret=${process.env.6z44fcq92brjmyls36gudfag0oe0fm}&grant_type=client_credentials`
+      body: `client_id=${process.env.TWITCH_CLIENT_ID}&client_secret=${process.env.TWITCH_CLIENT_SECRET}&grant_type=client_credentials`
     });
 
     const tokenData = await tokenResponse.json();
@@ -16,11 +17,11 @@ export default async function handler(req, res) {
 
     const accessToken = tokenData.access_token;
 
-    // Schritt 2: User-Info mit Login-Namen holen
-    const userResponse = await fetch(`https://api.twitch.tv/helix/users?login=nordylp`, {
+    // 2. User Info mit Login holen
+    const userResponse = await fetch("https://api.twitch.tv/helix/users?login=nordylp", {
       headers: {
-        "Client-ID": process.env.TWITCH_CLIENT_ID,
-        "Authorization": `Bearer ${accessToken}`
+        "gpqiwy5bgyaniw4avqmsl0zo2re1p8": process.env.TWITCH_CLIENT_ID,
+        "6z44fcq92brjmyls36gudfag0oe0fm": `Bearer ${accessToken}`
       }
     });
 
@@ -30,11 +31,10 @@ export default async function handler(req, res) {
       return res.status(userResponse.status).json({ error: "Twitch API error", details: userData });
     }
 
-    // Schritt 3: ID zurückgeben
+    // 3. Ergebnis zurückgeben
     res.status(200).json({
       login: "nordylp",
-      userId: userData.data?.[0]?.id || "not found",
-      raw: userData
+      userId: userData.data?.[0]?.id || "not found"
     });
   } catch (err) {
     res.status(500).json({ error: "Server error", details: err.message });
